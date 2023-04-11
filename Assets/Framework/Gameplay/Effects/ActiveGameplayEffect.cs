@@ -4,14 +4,14 @@ using Cysharp.Threading.Tasks;
 using Framework.Persistence;
 using Framework.Persistence.Intermediate;
 
-namespace Framework.Gameplay.Abilities {
+namespace Framework.Gameplay.Effects {
     [Serializable]
-    public abstract class GameplayAbility : IPersistent {
-        public virtual bool CanActivate(GameplayObject obj) {
-            return true;
-        }
-
+    public abstract class ActiveGameplayEffect : IPersistent {
         public virtual void OnActivate(GameplayObject obj) { }
+
+        public virtual void OnTick(GameplayObject obj, float deltaSeconds) { }
+
+        public virtual void OnDeactivate(GameplayObject obj) { }
 
         public virtual PersistentData WritePersistentData(PersistentData data, PersistentSerializer serializer) {
             return data;

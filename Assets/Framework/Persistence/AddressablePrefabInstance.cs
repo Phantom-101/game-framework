@@ -1,5 +1,10 @@
+#nullable enable
+using Newtonsoft.Json;
+
 namespace Framework.Persistence {
-    public class AddressablePrefabInstance : PersistentPrefabInstance {
-        public string key;
+    [JsonObject(MemberSerialization.OptIn)]
+    public class AddressablePrefabInstance : PersistentGameObject {
+        [JsonProperty]
+        public string key = string.Empty;
     }
 }

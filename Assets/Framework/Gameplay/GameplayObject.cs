@@ -4,6 +4,7 @@ using System.Linq;
 using Cysharp.Threading.Tasks;
 using Framework.Gameplay.Effects;
 using Framework.Persistence;
+using Framework.Persistence.Intermediate;
 using UnityEngine;
 
 namespace Framework.Gameplay {

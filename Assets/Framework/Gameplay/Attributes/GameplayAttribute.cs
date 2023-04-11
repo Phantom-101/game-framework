@@ -3,6 +3,7 @@ using System;
 using Cysharp.Threading.Tasks;
 using Framework.Gameplay.Effects;
 using Framework.Persistence;
+using Framework.Persistence.Intermediate;
 using Framework.Variables;
 using UnityEngine;
 

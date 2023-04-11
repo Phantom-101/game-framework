@@ -2,6 +2,7 @@
 using System;
 using Cysharp.Threading.Tasks;
 using Framework.Persistence;
+using Framework.Persistence.Intermediate;
 using UnityEngine;
 
 namespace Framework.Gameplay.Effects {

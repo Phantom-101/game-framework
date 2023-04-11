@@ -2,6 +2,7 @@
 using System;
 using Cysharp.Threading.Tasks;
 using Framework.Persistence;
+using Framework.Persistence.Intermediate;
 
 namespace Framework.Gameplay.Effects {
     [Serializable]

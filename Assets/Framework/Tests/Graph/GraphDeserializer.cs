@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Framework.Persistence;
+using Framework.Persistence.Intermediate;
+using Framework.Persistence.Intermediate.Converters;
 using Newtonsoft.Json;
 using UnityEngine;
 
@@ -19,7 +21,7 @@ namespace Framework.Tests.Graph {
                         Destroy(child.gameObject);
                     }
 
-                    var serializer = new PersistentSerializer(new IPersistentConverter[] { new ScriptablePrefabConverter(prefabs), new DefaultConverter() });
+                    var serializer = new PersistentSerializer(new IPersistentConverter[] { new PersistentGameObjectConverter(prefabs), new DefaultConverter() });
 
                     var data = new List<PersistentData>();
                     foreach (var node in nodeSet.Value) {

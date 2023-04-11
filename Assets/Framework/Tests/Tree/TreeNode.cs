@@ -3,11 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
 using Framework.Persistence;
+using Framework.Persistence.Intermediate;
+using Newtonsoft.Json;
 using UnityEngine;
 
 namespace Framework.Tests.Tree {
+    [JsonObject(MemberSerialization.OptIn)]
     public class TreeNode : PersistentObject {
+        [JsonProperty]
         public bool isIncreasing;
+        
+        [JsonProperty]
         public int number;
 
         public ScriptablePrefabInstance? GetParent() {

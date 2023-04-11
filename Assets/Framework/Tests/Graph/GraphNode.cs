@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Framework.Persistence;
+using Framework.Persistence.Intermediate;
 
 namespace Framework.Tests.Graph {
     public class GraphNode : PersistentObject {
