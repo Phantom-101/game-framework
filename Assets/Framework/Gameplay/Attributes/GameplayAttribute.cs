@@ -1,19 +1,20 @@
 #nullable enable
 using System;
-using Cysharp.Threading.Tasks;
 using Framework.Gameplay.Effects;
-using Framework.Persistence;
-using Framework.Persistence.Intermediate;
 using Framework.Variables;
+using Newtonsoft.Json;
 using UnityEngine;
 
 namespace Framework.Gameplay.Attributes {
     [Serializable]
-    public class GameplayAttribute : IPersistent {
+    [JsonObject(MemberSerialization.OptIn, IsReference = true)]
+    public class GameplayAttribute {
         [field: SerializeField]
+        [JsonProperty]
         public ValueReference<float> BaseValue { get; private set; } = new();
 
         [field: SerializeField]
+        [JsonProperty]
         public AggregateModifier Aggregator { get; private set; } = new();
 
         [SerializeField]
@@ -37,17 +38,6 @@ namespace Framework.Gameplay.Attributes {
             return value;
         }
         
-        public PersistentData WritePersistentData(PersistentData data, PersistentSerializer serializer) {
-            data.Add("baseValue", BaseValue.Value);
-            data.Add("aggregator", serializer.Save(Aggregator)!);
-            return data;
-        }
-
-        public async UniTask ReadPersistentData(PersistentData data, PersistentSerializer serializer) {
-            BaseValue.SetValue(data.Get<float>("baseValue"));
-            Aggregator = (AggregateModifier)(await serializer.Load(data.Get<PersistentData>("aggregator")))!;
-        }
-
         private void NotifyChange(object sender, EventArgs e) {
             dirty = true;
             OnChanged?.Invoke(this, EventArgs.Empty);

@@ -2,9 +2,9 @@
 using Newtonsoft.Json;
 
 namespace Framework.Persistence {
-    [JsonObject(MemberSerialization.OptIn)]
+    [JsonObject(MemberSerialization.OptIn, IsReference = true)]
     public class AddressablePrefabInstance : PersistentGameObject {
         [JsonProperty]
-        public string key = string.Empty;
+        public string prefabKey = string.Empty;
     }
 }

@@ -45,7 +45,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aeb904acefe2416793767773328bf3fb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  prefab: {fileID: 11400000, guid: a6b751e267ff5ac4faaaf8385c1412a7, type: 2}
+  name: 
+  position: []
+  rotation: []
+  components: []
+  prefabId: 53875979-17ac-49e7-a834-4624d5824f39
 --- !u!114 &7696847727962976684
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -60,3 +64,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isIncreasing: 1
   number: 0
+  children: []

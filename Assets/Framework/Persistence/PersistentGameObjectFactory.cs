@@ -1,5 +1,5 @@
 #nullable enable
-using Cysharp.Threading.Tasks;
+using Framework.Utilities;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 
@@ -7,77 +7,38 @@ namespace Framework.Persistence {
     public static class PersistentGameObjectFactory {
         public static GameObject NewEmpty() {
             var obj = new GameObject();
-            obj.AddComponent<PersistentGameObject>();
+            obj.GetOrAddComponent<PersistentGameObject>();
             return obj;
         }
         
-        public static GameObject? InstantiateFromAddressableKey(string key) {
+        public static GameObject? NewFromAddressableKey(string key) {
             var prefab = Addressables.LoadAssetAsync<GameObject>(key).WaitForCompletion();
             if (prefab != null) {
                 var obj = Object.Instantiate(prefab);
-                var metadata = obj.GetComponent<AddressablePrefabInstance>();
-                if (metadata == null) {
-                    metadata = obj.AddComponent<AddressablePrefabInstance>();
-                }
-                metadata.key = key;
+                var metadata = obj.GetOrAddComponent<AddressablePrefabInstance>();
+                metadata.prefabKey = key;
                 return obj;
             }
 
             return null;
         }
         
-        public static async UniTask<GameObject?> InstantiateFromAddressableKeyAsync(string key) {
-            var prefab = await Addressables.LoadAssetAsync<GameObject>(key);
-            if (prefab != null) {
-                var obj = Object.Instantiate(prefab);
-                var metadata = obj.GetComponent<AddressablePrefabInstance>();
-                if (metadata == null) {
-                    metadata = obj.AddComponent<AddressablePrefabInstance>();
-                }
-                metadata.key = key;
-                return obj;
-            }
-
-            return null;
-        }
-
-        public static GameObject? InstantiateFromResourcePath(string path) {
+        public static GameObject? NewFromResourcePath(string path) {
             var prefab = Resources.Load<GameObject>(path);
             if (prefab != null) {
                 var obj = Object.Instantiate(prefab);
-                var metadata = obj.GetComponent<ResourcePrefabInstance>();
-                if (metadata == null) {
-                    metadata = obj.AddComponent<ResourcePrefabInstance>();
-                }
-                metadata.path = path;
+                var metadata = obj.GetOrAddComponent<ResourcePrefabInstance>();
+                metadata.prefabPath = path;
                 return obj;
             }
 
             return null;
         }
 
-        public static async UniTask<GameObject?> InstantiateFromResourcePathAsync(string path) {
-            var resource = await Resources.LoadAsync<GameObject>(path);
-            if (resource != null && resource is GameObject prefab) {
-                var obj = Object.Instantiate(prefab);
-                var metadata = obj.GetComponent<ResourcePrefabInstance>();
-                if (metadata == null) {
-                    metadata = obj.AddComponent<ResourcePrefabInstance>();
-                }
-                metadata.path = path;
-                return obj;
-            }
-
-            return null;
-        }
-
-        public static GameObject InstantiateFromScriptablePrefab(ScriptablePrefab prefab) {
+        public static GameObject NewFromScriptablePrefab(ScriptablePrefab prefab) {
             var obj = Object.Instantiate(prefab.obj);
-            var metadata = obj.GetComponent<ScriptablePrefabInstance>();
-            if (metadata == null) {
-                metadata = obj.AddComponent<ScriptablePrefabInstance>();
-            }
-            metadata.prefab = prefab;
+            var metadata = obj.GetOrAddComponent<ScriptablePrefabInstance>();
+            metadata.prefabId = prefab.id;
             return obj;
         }
     }

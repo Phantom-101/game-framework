@@ -1,20 +1,23 @@
 #nullable enable
 using System.Collections.Generic;
 using System.Linq;
-using Cysharp.Threading.Tasks;
+using System.Runtime.Serialization;
 using Framework.Persistence;
-using Framework.Persistence.Intermediate;
 using Newtonsoft.Json;
 using UnityEngine;
 
 namespace Framework.Tests.Tree {
-    [JsonObject(MemberSerialization.OptIn)]
-    public class TreeNode : PersistentObject {
+    [JsonObject(MemberSerialization.OptIn, IsReference = true)]
+    public class TreeNode : MonoBehaviour {
         [JsonProperty]
         public bool isIncreasing;
         
         [JsonProperty]
         public int number;
+
+        [SerializeField]
+        [JsonProperty]
+        private List<ScriptablePrefabInstance> children = new();
 
         public ScriptablePrefabInstance? GetParent() {
             var parent = transform.parent;
@@ -33,24 +36,15 @@ namespace Framework.Tests.Tree {
             }
         }
 
-        public override PersistentData WritePersistentData(PersistentData data, PersistentSerializer serializer) {
-            base.WritePersistentData(data, serializer);
-            data.Add("isIncreasing", isIncreasing);
-            data.Add("number", number);
-            data.Add("children", GetChildren().ConvertAll(serializer.Save).ToList());
-            return data;
+        [OnSerializing]
+        private void OnSerializing(StreamingContext context) {
+            children = GetChildren();
         }
 
-        public override async UniTask ReadPersistentData(PersistentData data, PersistentSerializer serializer) {
-            await base.ReadPersistentData(data, serializer);
-            isIncreasing = data.Get<bool>("isIncreasing");
-            number = data.Get<int>("number");
-            var children = data.Get<List<PersistentData>>("children");
+        [OnDeserialized]
+        private void OnDeserialized(StreamingContext context) {
             foreach (var child in children) {
-                var obj = (ScriptablePrefabInstance?)await serializer.Load(child);
-                if (obj != null) {
-                    obj.transform.SetParent(transform, false);
-                }
+                child.transform.SetParent(transform, false);
             }
         }
     }

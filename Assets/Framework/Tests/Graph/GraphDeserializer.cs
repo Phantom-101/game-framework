@@ -1,9 +1,7 @@
 #nullable enable
 using System.Collections.Generic;
-using Cysharp.Threading.Tasks;
 using Framework.Persistence;
-using Framework.Persistence.Intermediate;
-using Framework.Persistence.Intermediate.Converters;
+using Framework.Persistence.Converters;
 using Newtonsoft.Json;
 using UnityEngine;
 
@@ -15,33 +13,30 @@ namespace Framework.Tests.Graph {
 
         private void Update() {
             if (deserialize) {
+                foreach (Transform child in transform) {
+                    Destroy(child.gameObject);
+                }
+
+                var context = new GameObjectContext();
+                var settings = new JsonSerializerSettings {
+                    TypeNameHandling = TypeNameHandling.Objects,
+                    Converters = {
+                        new GameObjectConverter(context, prefabs),
+                        new ComponentConverter(context)
+                    }
+                };
+                
+                var serialized = JsonConvert.SerializeObject(nodeSet.Value, settings);
+                Debug.Log(serialized);
+
+                var objs = JsonConvert.DeserializeObject<HashSet<PersistentGameObject>>(serialized, settings)!;
+                foreach (var obj in objs) {
+                    if (obj != null) {
+                        obj.transform.SetParent(transform, false);
+                    }
+                }
+                
                 deserialize = false;
-                StartCoroutine(UniTask.ToCoroutine(async () => {
-                    foreach (Transform child in transform) {
-                        Destroy(child.gameObject);
-                    }
-
-                    var serializer = new PersistentSerializer(new IPersistentConverter[] { new PersistentGameObjectConverter(prefabs), new DefaultConverter() });
-
-                    var data = new List<PersistentData>();
-                    foreach (var node in nodeSet.Value) {
-                        var saved = serializer.Save(node);
-                        if (saved != null) {
-                            data.Add(saved);
-                        }
-                    }
-
-                    var serialized = JsonConvert.SerializeObject(data);
-                    Debug.Log(serialized);
-
-                    data = JsonConvert.DeserializeObject<List<PersistentData>>(serialized)!;
-                    foreach (var node in data) {
-                        var loaded = (ScriptablePrefabInstance?)await serializer.Load(node);
-                        if (loaded != null) {
-                            loaded.transform.SetParent(transform, false);
-                        }
-                    }
-                }));
             }
         }
     }

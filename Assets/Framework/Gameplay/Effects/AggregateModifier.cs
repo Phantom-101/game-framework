@@ -3,15 +3,15 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Cysharp.Threading.Tasks;
-using Framework.Persistence;
-using Framework.Persistence.Intermediate;
+using Newtonsoft.Json;
 using UnityEngine;
 
 namespace Framework.Gameplay.Effects {
     [Serializable]
+    [JsonObject(MemberSerialization.OptIn, IsReference = true)]
     public class AggregateModifier : GameplayModifier, IEnumerable<GameplayModifier> {
         [SerializeReference]
+        [JsonProperty]
         private List<GameplayModifier> modifiers = new();
 
         public AggregateModifier(int priority = 0) : base(priority) { }
@@ -38,20 +38,6 @@ namespace Framework.Gameplay.Effects {
 
         public override float Evaluate(float value) {
             return modifiers.Aggregate(value, (current, modifier) => modifier.Evaluate(current));
-        }
-
-        public override PersistentData WritePersistentData(PersistentData data, PersistentSerializer serializer) {
-            base.WritePersistentData(data, serializer);
-            data.Add("modifiers", modifiers.ConvertAll(serializer.Save));
-            return data;
-        }
-
-        public override async UniTask ReadPersistentData(PersistentData data, PersistentSerializer serializer) {
-            await base.ReadPersistentData(data, serializer);
-            var modifierData = data.Get<List<PersistentData>>("modifiers");
-            foreach (var modifier in modifierData) {
-                modifiers.Add((GameplayModifier)(await serializer.Load(modifier))!);
-            }
         }
 
         public IEnumerator<GameplayModifier> GetEnumerator() {

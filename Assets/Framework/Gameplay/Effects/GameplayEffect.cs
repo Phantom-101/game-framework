@@ -1,12 +1,9 @@
 #nullable enable
 using System;
-using Cysharp.Threading.Tasks;
-using Framework.Persistence;
-using Framework.Persistence.Intermediate;
 
 namespace Framework.Gameplay.Effects {
     [Serializable]
-    public abstract class GameplayEffect : IPersistent {
+    public abstract class GameplayEffect {
         public virtual bool CanApply(GameplayObject obj) {
             return true;
         }
@@ -16,11 +13,5 @@ namespace Framework.Gameplay.Effects {
         public virtual void OnTick(GameplayObject obj, float deltaSeconds) { }
 
         public virtual void OnDeactivate(GameplayObject obj) { }
-
-        public virtual PersistentData WritePersistentData(PersistentData data, PersistentSerializer serializer) {
-            return data;
-        }
-
-        public virtual async UniTask ReadPersistentData(PersistentData data, PersistentSerializer serializer) { }
     }
 }

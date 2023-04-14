@@ -1,56 +1,54 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
-using Cysharp.Threading.Tasks;
-using Framework.Persistence.Intermediate;
+using System.Linq;
+using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using UnityEngine;
 
 namespace Framework.Persistence {
-    [JsonObject(MemberSerialization.OptIn)]
-    public class PersistentGameObject : MonoBehaviour, IPersistent {
-        public virtual PersistentData WritePersistentData(PersistentData data, PersistentSerializer serializer) {
-            var components = new List<PersistentData>();
-            data.Add("components", components);
-            foreach (var component in GetComponents<IPersistent>()) {
-                // Do not save this component to prevent infinite loop
-                if (!ReferenceEquals(component, this)) {
-                    var componentData = new PersistentData();
-                    componentData.Add(Keys.ComponentType, component.GetType().FullName);
-                    component.WritePersistentData(componentData, serializer);
-                    components.Add(componentData);
-                }
-            }
+    [JsonObject(MemberSerialization.OptIn, IsReference = true)]
+    public class PersistentGameObject : MonoBehaviour {
+        [SerializeField]
+        [JsonProperty]
+        private new string name = string.Empty;
 
-            return data;
+        [SerializeField]
+        [JsonProperty]
+        private float[] position = Array.Empty<float>();
+
+        [SerializeField]
+        [JsonProperty]
+        private float[] rotation = Array.Empty<float>();
+
+        [SerializeField]
+        [JsonProperty]
+        private List<Component> components = new();
+        
+        private GameObjectContext? _context;
+
+        [OnSerializing]
+        private void OnSerializing(StreamingContext context) {
+            name = gameObject.name;
+            position = Vector3ToFloatArray(transform.localPosition);
+            rotation = Vector3ToFloatArray(transform.localEulerAngles);
+            components = GetComponents<Component>().Where(e => e != this && e.GetType().GetCustomAttributes(true).Any(attr => attr is JsonObjectAttribute)).ToList();
         }
 
-        public virtual async UniTask ReadPersistentData(PersistentData data, PersistentSerializer serializer) {
-            var components = data.Get<List<PersistentData>>("components");
-            var loaded = new List<IPersistent>();
-            foreach (var componentData in components) {
-                var type = Type.GetType(componentData.Get<string>(Keys.ComponentType));
-                // Verify component type inherits both Component and IPersistent
-                if (typeof(IPersistent).IsAssignableFrom(type) && typeof(Component).IsAssignableFrom(type)) {
-                    var isDataLoaded = false;
-                    // Prevent loading to the same component twice if multiple of the same component type needs to be loaded
-                    foreach (var target in GetComponents(type)) {
-                        var persistentTarget = (IPersistent)target;
-                        if (!loaded.Contains(persistentTarget)) {
-                            await persistentTarget.ReadPersistentData(componentData, serializer);
-                            loaded.Add(persistentTarget);
-                            isDataLoaded = true;
-                            break;
-                        }
-                    }
-                    // If isDataLoaded is still false by this point, no suitable load targets have been found and one needs to be created
-                    if (!isDataLoaded) {
-                        var target = (IPersistent)gameObject.AddComponent(type);
-                        await target.ReadPersistentData(componentData, serializer);
-                        loaded.Add(target);
-                    }
-                }
-            }
+        [OnDeserialized]
+        private void OnDeserialized(StreamingContext context) {
+            _context?.Pop();
+            gameObject.name = name;
+            transform.localPosition = FloatArrayToVector3(position);
+            transform.localEulerAngles = FloatArrayToVector3(rotation);
+        }
+        
+        private static float[] Vector3ToFloatArray(Vector3 v) {
+            return new[] { v.x, v.y, v.z };
+        }
+
+        private static Vector3 FloatArrayToVector3(IReadOnlyList<float> a) {
+            return new Vector3(a[0], a[1], a[2]);
         }
     }
 }
