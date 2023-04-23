@@ -15,18 +15,5 @@ namespace Framework.Gameplay {
                 effect.OnTick(this, Time.deltaTime);
             }
         }
-        
-        public void AddEffect(GameplayEffect effect) {
-            if (effect.CanApply(this)) {
-                effects.Add(effect);
-                effect.OnActivate(this);
-            }
-        }
-
-        public void RemoveEffect(GameplayEffect effect) {
-            if (effects.Remove(effect)) {
-                effect.OnDeactivate(this);
-            }
-        }
     }
 }

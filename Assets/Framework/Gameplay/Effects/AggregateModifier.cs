@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using UnityEngine;
 
@@ -40,6 +41,13 @@ namespace Framework.Gameplay.Effects {
             return modifiers.Aggregate(value, (current, modifier) => modifier.Evaluate(current));
         }
 
+        [OnDeserialized]
+        private void OnDeserialized(StreamingContext context) {
+            foreach (var modifier in modifiers) {
+                modifier.OnChanged += NotifyChange;
+            }
+        }
+        
         public IEnumerator<GameplayModifier> GetEnumerator() {
             return modifiers.GetEnumerator();
         }

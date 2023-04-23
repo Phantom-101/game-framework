@@ -1,5 +1,6 @@
 #nullable enable
 using System;
+using System.Runtime.Serialization;
 using Framework.Gameplay.Effects;
 using Framework.Variables;
 using Newtonsoft.Json;
@@ -41,6 +42,11 @@ namespace Framework.Gameplay.Attributes {
         private void NotifyChange(object sender, EventArgs e) {
             dirty = true;
             OnChanged?.Invoke(this, EventArgs.Empty);
+        }
+
+        [OnDeserialized]
+        private void OnDeserialized(StreamingContext context) {
+            Aggregator.OnChanged += NotifyChange;
         }
     }
 }

@@ -6,7 +6,7 @@ namespace Framework.Tests.Gameplay {
     public class TestEffect : GameplayEffect {
         private TestModifier? _modifier;
         
-        public override void OnActivate(GameplayObject obj) {
+        public void OnActivate(GameplayObject obj) {
             /*
             _modifier = (TestModifier)((TestEffectType)Type).modifier.NewInstance();
             _modifier.strength = ((TestEffectType)Type).strength;

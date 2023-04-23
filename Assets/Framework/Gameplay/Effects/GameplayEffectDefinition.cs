@@ -2,10 +2,8 @@ using UnityEngine;
 
 namespace Framework.Gameplay.Effects {
     public abstract class GameplayEffectDefinition : ScriptableObject {
-        public virtual bool CanApply(GameplayObject target) {
-            return true;
-        }
+        public abstract bool CanApply(GameplayObject target);
 
-        public virtual void Apply(GameplayObject target) { }
+        public abstract void OnApply(GameplayObject target);
     }
 }
