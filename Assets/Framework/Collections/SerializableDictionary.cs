@@ -13,10 +13,10 @@ namespace Framework.Collections {
         [JsonProperty]
         public Dictionary<TKey, TValue> value;
 
-        [SerializeField]
+        [SerializeReference]
         private List<TKey> serializedKeys = new();
 
-        [SerializeField]
+        [SerializeReference]
         private List<TValue> serializedValues = new();
 
         public SerializableDictionary() {

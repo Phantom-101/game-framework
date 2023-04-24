@@ -3,8 +3,10 @@ using UnityEngine;
 
 namespace Framework.Gameplay.Abilities {
     public abstract class GameplayAbilityDefinition : ScriptableObject {
-        public abstract bool CanActivate(GameplayObject source, GameplayObject target);
-        
-        public abstract void OnActivate(GameplayObject source, GameplayObject target);
+        /// <summary>
+        /// Creates a new gameplay ability with default values.
+        /// </summary>
+        /// <returns>New instance of the gameplay ability this scriptable object defines</returns>
+        public abstract GameplayAbility CreateGameplayAbility();
     }
 }

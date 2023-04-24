@@ -6,22 +6,28 @@ using UnityEngine;
 namespace Framework.Gameplay.Effects {
     [Serializable]
     [JsonObject(MemberSerialization.OptIn, IsReference = true)]
-    public class GameplayModifier {
-        [field: SerializeField]
+    public abstract class GameplayModifier {
+        public int Priority => priority;
+
+        [SerializeField]
         [JsonProperty]
-        public int Priority { get; private set; }
+        private int priority;
         
         public event EventHandler? OnChanged;
 
         protected GameplayModifier(int priority = 0) {
-            Priority = priority;
+            this.priority = priority;
         }
 
-        public virtual float Evaluate(float value) {
-            return value;
+        public abstract float Evaluate(float value);
+
+        public abstract float Evaluate(VersionedValue value);
+
+        protected void NotifyChange() {
+            OnChanged?.Invoke(this, EventArgs.Empty);
         }
         
-        protected void NotifyChange(object sender, EventArgs args) {
+        protected void OnDependencyChange(object sender, EventArgs args) {
             OnChanged?.Invoke(sender, args);
         }
     }

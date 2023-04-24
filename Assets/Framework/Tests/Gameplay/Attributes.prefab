@@ -9,9 +9,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2860643732335351588}
-  - component: {fileID: 2860643732335351591}
+  - component: {fileID: 4336394991275377294}
   - component: {fileID: 2860643732335351590}
-  - component: {fileID: 5934130478414410388}
   m_Layer: 0
   m_Name: Attributes
   m_TagString: Untagged
@@ -32,9 +31,9 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2860643732335351591
+--- !u!114 &4336394991275377294
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -43,21 +42,28 @@ MonoBehaviour:
   m_GameObject: {fileID: 2860643732335351592}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 41d40187f0be4c76b5cb4776d89ac6c9, type: 3}
+  m_Script: {fileID: 11500000, guid: 1bc9f9ca34944ec4b63997536854ec5c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  obj: {fileID: 0}
-  id: 
-  health:
-    baseValue:
-      useConstant: 1
-      constant: 100
-      variable: {fileID: 0}
-    aggregator:
-      modifiers: []
+  effects:
+    serializedValue: []
+  randomAttribute:
+    rid: 3325278849675296776
   references:
     version: 2
-    RefIds: []
+    RefIds:
+    - rid: 3325278849675296776
+      type: {class: GameplayAttribute, ns: Framework.Gameplay.Attributes, asm: Assembly-CSharp}
+      data:
+        <BaseValue>k__BackingField:
+          useConstant: 1
+          constant: 5
+          variable: {fileID: 0}
+        <Aggregator>k__BackingField:
+          priority: 0
+          modifiers: []
+        dirty: 1
+        value: 0
 --- !u!114 &2860643732335351590
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -70,21 +76,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fea62242ee0d495e898750827c91b298, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  obj: {fileID: 5934130478414410388}
-  type: {fileID: 11400000, guid: fdf75a7683421b24ba4bd13f767a9a81, type: 2}
---- !u!114 &5934130478414410388
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2860643732335351592}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8d41b94a8ae8428690aee23139d7a2f0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  <Type>k__BackingField: {fileID: 11400000, guid: 26a2959494990bb47877d27b8147ee15,
-    type: 2}
-  id: 
-  attributeSets: []
+  obj: {fileID: 4336394991275377294}

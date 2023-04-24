@@ -13,7 +13,7 @@ namespace Framework.Collections {
         [JsonProperty]
         public HashSet<T> value;
 
-        [SerializeField]
+        [SerializeReference]
         private List<T> serializedValue = new();
 
         public SerializableHashSet() {
