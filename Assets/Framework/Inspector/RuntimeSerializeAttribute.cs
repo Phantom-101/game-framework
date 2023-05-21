@@ -1,6 +1,6 @@
 using System;
 
-namespace Framework.Serialization {
+namespace Framework.Inspector {
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
     public class RuntimeSerializeAttribute : Attribute { }
 }

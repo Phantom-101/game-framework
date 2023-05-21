@@ -1,9 +1,12 @@
-using Framework.Providers;
+using Framework.Producers;
+using UnityEngine;
 
 namespace Framework.Variables {
-    public abstract class ScriptableVariable<T> : ScriptableProvider<T> {
+    public abstract class ScriptableVariable<T> : ScriptableObject, IProducer<T> {
         public abstract T Value { get; set; }
-
-        public override T Provide() => Value;
+        
+        object IProducer.Produce() => Produce();
+        
+        public T Produce() => Value;
     }
 }

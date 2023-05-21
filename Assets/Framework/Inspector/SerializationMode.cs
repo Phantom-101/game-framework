@@ -1,4 +1,4 @@
-namespace Framework.Serialization {
+namespace Framework.Inspector {
     public enum SerializationMode {
         Editor,
         Runtime

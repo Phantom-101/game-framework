@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reflection;
 using UnityEngine;
 
-namespace Framework.Serialization {
+namespace Framework.Inspector {
     public abstract class SerializableMonoBehaviour : MonoBehaviour, ISerializable {
         public virtual IEnumerable<FieldInfo> GetSerializableFields(SerializationMode mode) {
             const BindingFlags flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;

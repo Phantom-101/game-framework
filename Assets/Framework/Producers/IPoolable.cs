@@ -1,6 +1,6 @@
 using System;
 
-namespace Framework.Providers {
+namespace Framework.Producers {
     public interface IPoolable {
         event EventHandler OnRequestRelease;
 

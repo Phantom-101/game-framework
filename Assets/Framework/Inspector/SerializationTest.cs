@@ -1,4 +1,4 @@
-namespace Framework.Serialization {
+namespace Framework.Inspector {
     public class SerializationTest : SerializableMonoBehaviour {
         [EditorSerialize] public float editorOnly;
         [RuntimeSerialize] public float runtimeOnly;

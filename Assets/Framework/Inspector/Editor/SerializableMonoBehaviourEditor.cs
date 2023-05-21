@@ -1,7 +1,7 @@
 using UnityEditor;
 using UnityEngine.UIElements;
 
-namespace Framework.Serialization.Editor {
+namespace Framework.Inspector.Editor {
     [CustomEditor(typeof(SerializableMonoBehaviour), true)]
     public class SerializableMonoBehaviourEditor : UnityEditor.Editor {
         private SerializableMonoBehaviour _target;

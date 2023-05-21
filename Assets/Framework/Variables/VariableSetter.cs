@@ -3,10 +3,12 @@ using UnityEngine;
 namespace Framework.Variables {
     public class VariableSetter<T> : MonoBehaviour {
         public ScriptableVariable<T> variable;
-        public T value;
+        
+        [field: SerializeField]
+        public virtual T Value { get; set; }
 
         private void Awake() {
-            variable.Value = value;
+            variable.Value = Value;
         }
     }
 }
