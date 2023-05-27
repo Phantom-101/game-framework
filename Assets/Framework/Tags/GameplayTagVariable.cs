@@ -2,7 +2,7 @@
 using Framework.Variables;
 using UnityEngine;
 
-namespace Framework.Gameplay.Tags {
+namespace Framework.Tags {
     [CreateAssetMenu(menuName = "Gameplay/Tag", fileName = "NewGameplayTag")]
     public class GameplayTagVariable : ScriptableVariable<GameplayTag> {
         public GameplayTagSet tagSet = null!;

@@ -1,12 +1,10 @@
+#nullable enable
 using Framework.Producers;
-using UnityEngine;
 
 namespace Framework.Variables {
-    public abstract class ScriptableVariable<T> : ScriptableObject, IProducer<T> {
+    public abstract class ScriptableVariable<T> : ScriptableProducer<T> {
         public abstract T Value { get; set; }
         
-        object IProducer.Produce() => Produce();
-        
-        public T Produce() => Value;
+        public override T Produce() => Value;
     }
 }

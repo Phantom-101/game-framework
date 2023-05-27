@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Framework.Collections {
@@ -57,12 +58,15 @@ namespace Framework.Collections {
                 nodes[firstEmptyIndex].value = value;
                 nodes[firstEmptyIndex].version++;
                 var newFirstEmptyIndex = nodes[firstEmptyIndex].nextIndex;
+                nodes[firstEmptyIndex].previousIndex = -1;
                 nodes[firstEmptyIndex].nextIndex = firstIndex;
                 nodes[firstIndex].previousIndex = firstEmptyIndex;
                 firstIndex = firstEmptyIndex;
                 firstEmptyIndex = newFirstEmptyIndex;
             }
-            
+            if (firstEmptyIndex != -1) {
+                nodes[firstEmptyIndex].previousIndex = -1;
+            }
             globalVersion++;
             count++;
             return new NodeHandle(this, value, firstIndex, nodes[firstIndex].version);
@@ -82,14 +86,32 @@ namespace Framework.Collections {
                 nodes[firstEmptyIndex].version++;
                 var newFirstEmptyIndex = nodes[firstEmptyIndex].nextIndex;
                 nodes[firstEmptyIndex].previousIndex = lastIndex;
+                nodes[firstEmptyIndex].nextIndex = -1;
                 nodes[lastIndex].nextIndex = firstEmptyIndex;
                 lastIndex = firstEmptyIndex;
                 firstEmptyIndex = newFirstEmptyIndex;
             }
-
+            if (firstEmptyIndex != -1) {
+                nodes[firstEmptyIndex].previousIndex = -1;
+            }
             globalVersion++;
             count++;
             return new NodeHandle(this, value, lastIndex, nodes[lastIndex].version);
+        }
+
+        public void Clear() {
+            for (var i = 0; i < nodes.Length; i++) {
+                nodes[i].previousIndex = i - 1;
+                nodes[i].nextIndex = i + 1;
+                nodes[i].value = default;
+                nodes[i].version++;
+            }
+            nodes[^1].nextIndex = -1;
+            firstIndex = -1;
+            lastIndex = -1;
+            firstEmptyIndex = 0;
+            globalVersion++;
+            count = 0;
         }
         
         private void TryExpand() {
@@ -108,7 +130,15 @@ namespace Framework.Collections {
             nodes[prevLength].previousIndex = -1;
             firstEmptyIndex = prevLength;
         }
-        
+
+        public override string ToString() {
+            var ret = $"FI: {firstIndex} LI: {lastIndex} FEI: {firstEmptyIndex} C: {count}\n";
+            for (var i = 0; i < nodes.Length; i++) {
+                ret += $"{i} | {nodes[i].ToString()}\n";
+            }
+            return ret;
+        }
+
         public readonly struct NodeHandle {
             public readonly LocalLinkedList<T> list;
             public readonly T? value;
@@ -150,13 +180,16 @@ namespace Framework.Collections {
                 list.nodes[list.firstEmptyIndex].nextIndex = _index;
                 if (list.firstIndex == _index) {
                     list.firstIndex = list.firstEmptyIndex;
+                    list.nodes[list.firstEmptyIndex].previousIndex = -1;
                 } else {
                     list.nodes[list.nodes[_index].previousIndex].nextIndex = list.firstEmptyIndex;
                     list.nodes[list.firstEmptyIndex].previousIndex = list.nodes[_index].previousIndex;
-                    list.nodes[_index].previousIndex = list.firstEmptyIndex;
                 }
+                list.nodes[_index].previousIndex = list.firstEmptyIndex;
                 list.firstEmptyIndex = newFirstEmptyIndex;
-                list.nodes[list.firstEmptyIndex].previousIndex = -1;
+                if (list.firstEmptyIndex != -1) {
+                    list.nodes[list.firstEmptyIndex].previousIndex = -1;
+                }
                 list.globalVersion++;
                 list.count++;
                 return new NodeHandle(list, newValue, list.nodes[_index].previousIndex, list.nodes[list.nodes[_index].previousIndex].version);
@@ -171,16 +204,42 @@ namespace Framework.Collections {
                 list.nodes[list.firstEmptyIndex].previousIndex = _index;
                 if (list.lastIndex == _index) {
                     list.lastIndex = list.firstEmptyIndex;
+                    list.nodes[list.firstEmptyIndex].nextIndex = -1;
                 } else {
                     list.nodes[list.nodes[_index].nextIndex].previousIndex = list.firstEmptyIndex;
                     list.nodes[list.firstEmptyIndex].nextIndex = list.nodes[_index].nextIndex;
-                    list.nodes[_index].nextIndex = list.firstEmptyIndex;
                 }
+                list.nodes[_index].nextIndex = list.firstEmptyIndex;
                 list.firstEmptyIndex = newFirstEmptyIndex;
-                list.nodes[list.firstEmptyIndex].previousIndex = -1;
+                if (list.firstEmptyIndex != -1) {
+                    list.nodes[list.firstEmptyIndex].previousIndex = -1;
+                }
                 list.globalVersion++;
                 list.count++;
                 return new NodeHandle(list, newValue, list.nodes[_index].nextIndex, list.nodes[list.nodes[_index].nextIndex].version);
+            }
+
+            public void Remove() {
+                if (!IsValid()) throw new ArgumentException("Handle is invalid");
+                if (list.nodes[_index].previousIndex != -1) {
+                    list.nodes[list.nodes[_index].previousIndex].nextIndex = list.nodes[_index].nextIndex;
+                }
+                if (list.nodes[_index].nextIndex != -1) {
+                    list.nodes[list.nodes[_index].nextIndex].previousIndex = list.nodes[_index].previousIndex;
+                }
+                if (list.firstIndex == _index) {
+                    list.firstIndex = list.nodes[_index].nextIndex;
+                }
+                if (list.lastIndex == _index) {
+                    list.lastIndex = list.nodes[_index].previousIndex;
+                }
+                list.nodes[_index].value = default;
+                list.nodes[_index].version++;
+                list.nodes[_index].previousIndex = -1;
+                list.nodes[_index].nextIndex = list.firstEmptyIndex;
+                list.firstEmptyIndex = _index;
+                list.globalVersion++;
+                list.count--;
             }
         }
 
@@ -190,6 +249,10 @@ namespace Framework.Collections {
             public int previousIndex;
             public int nextIndex;
             public uint version;
+
+            public override string ToString() {
+                return $"PI: {previousIndex} NI: {nextIndex} V: {version} | {value?.ToString() ?? "null"}";
+            }
         }
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();

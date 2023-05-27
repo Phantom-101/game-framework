@@ -3,9 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
-using UnityEditor.UIElements;
 using UnityEngine;
-using UnityEngine.UIElements;
+using Object = UnityEngine.Object;
 
 namespace Framework.Inspector.Editor {
     [CustomPropertyDrawer(typeof(SelectImplementationAttribute))]
@@ -14,32 +13,59 @@ namespace Framework.Inspector.Editor {
         private int _implementationTypeIndex;
 
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label) {
-            return EditorGUI.GetPropertyHeight(property) + EditorGUIUtility.singleLineHeight * 4;
+            return EditorGUI.GetPropertyHeight(property) + EditorGUIUtility.singleLineHeight * 3;
         }
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label) {
             var height = EditorGUIUtility.singleLineHeight;
+            var curY = position.y;
             
-            var refreshRect = new Rect(position.x, position.y, position.width, height);
+            var type = ((SelectImplementationAttribute)attribute).fieldType;
+            
+            var refreshRect = new Rect(position.x, curY, position.width, height);
+            var refreshed = false;
             if (_implementations == null || GUI.Button(refreshRect, "Refresh Implementations")) {
-                RefreshImplementations();
+                RefreshImplementations(type);
+                refreshed = true;
             }
 
-            var textRect = new Rect(position.x, refreshRect.y + height, position.width, height);
-            EditorGUI.LabelField(textRect, $"Found {_implementations!.Count} implementations");
+            curY += height;
             
-            var popupRect = new Rect(position.x, textRect.y + height, position.width, height);
-            _implementationTypeIndex = EditorGUI.Popup(popupRect, _implementationTypeIndex, _implementations.Select(impl => impl.FullName).ToArray());
+            // Make sure index is compatible with the current value in the property
+            if (type.IsInstanceOfType(property.managedReferenceValue)) {
+                if (!refreshed) {
+                    RefreshImplementations(type);
+                }
+                
+                if (!_implementations![_implementationTypeIndex].IsInstanceOfType(property.managedReferenceValue)) {
+                    _implementationTypeIndex = _implementations.IndexOf(property.managedReferenceValue.GetType());
+                }
+            } else {
+                property.managedReferenceValue = null;
+            }
+            
+            var popupRect = new Rect(position.x, curY, position.width, height);
+            _implementationTypeIndex = EditorGUI.Popup(popupRect, _implementationTypeIndex, _implementations!.Select(impl => impl.FullName).ToArray());
 
-            var buttonRect = new Rect(position.x, popupRect.y + height, position.width, height);
+            curY += height;
+
+            // If type has been changed, change property value accordingly
+            if (!_implementations![_implementationTypeIndex].IsInstanceOfType(property.managedReferenceValue)) {
+                property.managedReferenceValue = null;
+            }
+
+            var buttonRect = new Rect(position.x, curY, position.width, height);
             if (GUI.Button(buttonRect, "Create Instance")) {
                 property.managedReferenceValue = Activator.CreateInstance(_implementations[_implementationTypeIndex]);
             }
 
-            var propertyRect = new Rect(position.x, buttonRect.y + height, position.width, height);
+            curY += height;
+
+            var propertyRect = new Rect(position.x, curY, position.width, height);
             EditorGUI.PropertyField(propertyRect, property, true);
         }
 
+        /* outdated
         public override VisualElement CreatePropertyGUI(SerializedProperty property) {
             if (_implementations == null) {
                 RefreshImplementations();
@@ -65,19 +91,15 @@ namespace Framework.Inspector.Editor {
 
             return ret;
         }
+        */
 
-        private void RefreshImplementations() {
-            _implementations = GetImplementations(((SelectImplementationAttribute)attribute).fieldType)
-                .Where(impl => !impl.IsSubclassOf(typeof(UnityEngine.Object))).ToList();
+        private void RefreshImplementations(Type interfaceType) {
+            _implementations = GetImplementations(interfaceType).Where(e => !typeof(Object).IsAssignableFrom(e)).ToList();
         }
 
         private static IEnumerable<Type> GetImplementations(Type interfaceType) {
             var types = AppDomain.CurrentDomain.GetAssemblies().SelectMany(assembly => assembly.GetTypes());
             return types.Where(p => interfaceType.IsAssignableFrom(p) && !p.IsAbstract).ToArray();
-        }
-
-        private static void CreateInstance(SerializedProperty property, Type type) {
-            property.managedReferenceValue = Activator.CreateInstance(type);
         }
     }
 }

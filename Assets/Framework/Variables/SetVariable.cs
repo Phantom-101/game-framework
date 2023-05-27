@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
 namespace Framework.Variables {
@@ -16,7 +15,7 @@ namespace Framework.Variables {
 
         public void OnAfterDeserialize() {
             Value.Clear();
-            Value.AddRange(items);
+            items.ForEach(e => Value.Add(e));
         }
     }
 }

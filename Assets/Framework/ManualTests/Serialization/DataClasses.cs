@@ -7,7 +7,7 @@ namespace Framework.Tests.Serialization {
     [JsonObject(MemberSerialization.OptIn)]
     public class A {
         [JsonProperty]
-        public string name;
+        public string name = string.Empty;
 
         [JsonProperty]
         public A? child;

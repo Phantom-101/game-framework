@@ -6,7 +6,7 @@ using UnityEngine.Pool;
 
 namespace Framework.Producers {
     [CreateAssetMenu(menuName = "Provider/Pool", fileName = "NewPool")]
-    public class ScriptablePool<T> : ScriptableObject, IProducer<T> where T : class, IPoolable {
+    public class ScriptablePool<T> : ScriptableProducer<T> where T : class, IPoolable {
         [SerializeReference]
         public ValueReference<IProducer> creationProducer = new();
         public int defaultCapacity = 10;
@@ -14,9 +14,7 @@ namespace Framework.Producers {
 
         private ObjectPool<T>? _pool;
         
-        object IProducer.Produce() => Produce();
-        
-        public T Produce() {
+        public override T Produce() {
             _pool ??= new ObjectPool<T>(() => (T)creationProducer.Value.Produce(), OnGet, OnRelease, DestroyInstance, true, defaultCapacity, maxSize);
             return _pool.Get();
         }

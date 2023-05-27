@@ -3,7 +3,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Newtonsoft.Json;
-using Unity.VisualScripting;
 using UnityEngine;
 
 namespace Framework.Collections {
@@ -39,7 +38,7 @@ namespace Framework.Collections {
 
         public void OnAfterDeserialize() {
             value.Clear();
-            value.AddRange(serializedValue);
+            serializedValue.ForEach(e => value.Add(e));
         }
     }
 }

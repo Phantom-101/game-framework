@@ -2,7 +2,7 @@
 using System;
 using Newtonsoft.Json;
 
-namespace Framework.Gameplay.Tags {
+namespace Framework.Tags {
     [Serializable]
     [JsonObject(MemberSerialization.OptIn, IsReference = true)]
     public class GameplayTag {

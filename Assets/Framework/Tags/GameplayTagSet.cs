@@ -3,7 +3,7 @@ using System.Linq;
 using Framework.Variables;
 using UnityEngine;
 
-namespace Framework.Gameplay.Tags {
+namespace Framework.Tags {
     [CreateAssetMenu(menuName = "Gameplay/TagSet", fileName = "NewGameplayTagSet")]
     public class GameplayTagSet : SetVariable<GameplayTag> {
         public GameplayTag? Get(string path) {
